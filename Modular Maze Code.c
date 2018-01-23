@@ -15,18 +15,36 @@ float getDegrees(float distance)
 	return degrees;
 }
 
-void rightTurn(deg)
+void rightTurn(int deg)
 {
-
 	resetGyro(gyroSensor); // first reset gyro
 	// adjust degrees for +- 3 degrees
+	deg -= 3;
 
 	repeatUntil (getGyroHeading(gyroSensor) > deg) {
-		if (getGyroHeading(gyroSensor) < 60) {
+		if (getGyroHeading(gyroSensor) < deg - 30) {
 			turnRight(10, degrees, 20);
 		}
 		else {
 			turnRight(2, degrees, 10);
+		}
+	}
+}
+
+void leftTurn(int deg)
+{
+	resetGyro(gyroSensor); // first reset gyro
+	wait10Msec(10);
+
+	// get target heading [current heading - degrees + error]
+	int targetHeading = -deg + 3;
+
+	repeatUntil (getGyroHeading(gyroSensor) <= targetHeading) {
+		if (getGyroHeading(gyroSensor) > targetHeading + 30) {
+			turnLeft(10, degrees, 20);
+		}
+		else {
+			turnLeft(2, degrees, 10);
 		}
 	}
 }
@@ -48,29 +66,17 @@ task main()
 	forward(getDegrees(19), degrees, 30);
 
 	// Turn right 90 degrees
-	repeatUntil (getGyroHeading(gyroSensor) > 86) {
-		if (getGyroHeading(gyroSensor) < 60) {
-			turnRight(10, degrees, 20);
-		}
-		else {
-			turnRight(2, degrees, 10);
-		}
-	}
+	rightTurn(90);
 
 	// Drive forward 9.5 inches
 	forward(getDegrees(9.5), degrees, 30);
 
 	// Turn left 90 degrees
-	resetGyro(gyroSensor); // first reset gyro
-	repeatUntil (getGyroHeading(gyroSensor) > 86) {
-		if (getGyroHeading(gyroSensor) < 60) {
-			turnRight(10, degrees, 20);
-		}
-		else {
-			turnRight(2, degrees, 10);
-		}
-	}
+	rightTurn(90);
 
 	// Drive forward 9.5 inches
 	forward(getDegrees(9.5), degrees, 30);
+
+	// Try turning left 180 degrees
+	leftTurn(180);
 }
